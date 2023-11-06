@@ -34,9 +34,8 @@ public class BaseballDAO {
 			return result;
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 			System.out.println("Errore connessione al database");
-			throw new RuntimeException("Error Connection Database");
+			throw new RuntimeException("Error Connection Database", e);
 		}
 	}
 
@@ -62,9 +61,8 @@ public class BaseballDAO {
 			return result;
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 			System.out.println("Errore connessione al database");
-			throw new RuntimeException("Error Connection Database");
+			throw new RuntimeException("Error Connection Database", e);
 		}
 	}
 
