@@ -2,9 +2,9 @@ package it.polito.tdp.exam.model;
 
 import java.util.Objects;
 
-public class Team {
+public class Team{
 
-    private Integer iD;
+    private Integer ID;
     private Integer year;
     private String teamCode;
     private String divID;
@@ -30,12 +30,12 @@ public class Team {
     
     
 
-    public Team(Integer iD, Integer year, String teamCode, String divID, Integer div_ID, Integer teamRank,
+    public Team(Integer ID, Integer year, String teamCode, String divID, Integer div_ID, Integer teamRank,
 			Integer games, Integer gamesHome, Integer wins, Integer losses, String divisionWinnner, String leagueWinner,
 			String worldSeriesWinnner, Integer runs, Integer hits, Integer homeruns, Integer stolenBases,
 			Integer hitsAllowed, Integer homerunsAllowed, String name, String park) {
 		super();
-		this.iD = iD;
+		this.ID = ID;
 		this.year = year;
 		this.teamCode = teamCode;
 		this.divID = divID;
@@ -61,11 +61,11 @@ public class Team {
     
     
 	public Integer getID(){
-        return iD;
+        return ID;
     }
 
-    public void setID(Integer iD){
-        this.iD=iD;
+    public void setID(Integer ID){
+        this.ID=ID;
     }
 
     public Integer getYear(){
@@ -230,7 +230,7 @@ public class Team {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(iD);
+		return Objects.hash(ID);
 	}
 
 	@Override
@@ -242,15 +242,16 @@ public class Team {
 		if (getClass() != obj.getClass())
 			return false;
 		Team other = (Team) obj;
-		return Objects.equals(iD, other.iD);
+		return Objects.equals(ID, other.ID);
 	}
 
 
 
 	@Override
 	public String toString() {
-		return teamCode;
+		return teamCode + ": " + name + "\n";
 	}
+
     
     
 

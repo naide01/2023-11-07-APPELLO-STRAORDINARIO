@@ -6,12 +6,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.exam.model.People;
 import it.polito.tdp.exam.model.Team;
 
 public class BaseballDAO {
+	
+	public List<String> readYear() {
+		String sql = "select distinct year "
+				+ "from teams t "
+				+ "where year>= 1980 ";
+		List<String> result = new ArrayList<String>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getString("year"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database", e);
+		}
+	}
+	
 
 	public List<People> readAllPlayers() {
 		String sql = "SELECT * " + "FROM people";
@@ -39,32 +66,123 @@ public class BaseballDAO {
 		}
 	}
 
-	public List<Team> readAllTeams() {
-		String sql = "SELECT * " + "FROM  teams";
-		List<Team> result = new ArrayList<Team>();
-
+//	public List<Team> readAllTeams(String anno) {
+//		String sql = "select distinct name "
+//				+ "from teams "
+//				+ "where year = ? ";
+//		List<Team> result = new ArrayList<Team>();
+//
+//		try {
+//			Connection conn = DBConnect.getConnection();
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			st.setString(1, anno);
+//			ResultSet rs = st.executeQuery();
+//
+//			while (rs.next()) {
+//				result.add(new Team(rs.getInt("iD"), rs.getInt("year"), rs.getString("teamCode"), rs.getString("divID"),
+//						rs.getInt("div_ID"), rs.getInt("teamRank"), rs.getInt("games"), rs.getInt("gamesHome"),
+//						rs.getInt("wins"), rs.getInt("losses"), rs.getString("divisionWinnner"),
+//						rs.getString("leagueWinner"), rs.getString("worldSeriesWinnner"), rs.getInt("runs"),
+//						rs.getInt("hits"), rs.getInt("homeruns"), rs.getInt("stolenBases"), rs.getInt("hitsAllowed"),
+//						rs.getInt("homerunsAllowed"), rs.getString("name"), rs.getString("park")));
+//			}
+//
+//			conn.close();
+//			return result;
+//
+//		} catch (SQLException e) {
+//			System.out.println("Errore connessione al database");
+//			throw new RuntimeException("Errore lettura squadre! ", e);
+//		}
+//	}
+	
+	public int numSquadre(String anno){
+		String sql = "select count(*) as c "
+				+ "from teams "
+				+ "where year = ? ";
+		int count = 0;
+		
 		try {
 			Connection conn = DBConnect.getConnection();
 			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, anno);
 			ResultSet rs = st.executeQuery();
-
+		
 			while (rs.next()) {
-				result.add(new Team(rs.getInt("iD"), rs.getInt("year"), rs.getString("teamCode"), rs.getString("divID"),
+				count = rs.getInt("c");
+			}
+		
+			conn.close();
+			return count;
+		
+		} catch (SQLException e) {
+			System.out.println("Errore connessione al database");
+		throw new RuntimeException("Errore lettura squadre! ", e);
+			}
+	}
+	
+	public List<Team> siglaSquadra(String anno) {
+		String sql = "select * "
+				+ "from teams "
+				+ "where year = ? ";
+		
+		List<Team> squadre = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, anno);
+			ResultSet rs = st.executeQuery();
+		
+			while (rs.next()) {
+				squadre.add(new Team(rs.getInt("ID"), rs.getInt("year"), rs.getString("teamCode"), rs.getString("divID"),
 						rs.getInt("div_ID"), rs.getInt("teamRank"), rs.getInt("games"), rs.getInt("gamesHome"),
 						rs.getInt("wins"), rs.getInt("losses"), rs.getString("divisionWinnner"),
 						rs.getString("leagueWinner"), rs.getString("worldSeriesWinnner"), rs.getInt("runs"),
 						rs.getInt("hits"), rs.getInt("homeruns"), rs.getInt("stolenBases"), rs.getInt("hitsAllowed"),
 						rs.getInt("homerunsAllowed"), rs.getString("name"), rs.getString("park")));
 			}
-
+		
 			conn.close();
-			return result;
-
+			return squadre;
+		
 		} catch (SQLException e) {
 			System.out.println("Errore connessione al database");
-			throw new RuntimeException("Error Connection Database", e);
-		}
+		throw new RuntimeException("Errore lettura squadre! ", e);
+			}
 	}
+	public Map<Team, Double> arcoPeso(String anno, Map<String, Team> idMap){
+		String sql = "select t.teamCode , sum(s.salary) as salario "
+				+ "from salaries s , people p , appearances a , teams t "
+				+ "where s.playerID = p.playerID "
+				+ "and p.playerID = a.playerID "
+				+ "and t.ID = a.teamID "
+				+ "and a.year =t.year "
+				+ "and t.year = ? "
+				+ "group by t.teamCode ";
+		
+		Map<Team, Double> arco = new HashMap<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, anno);
+			ResultSet rs = st.executeQuery();
+			
+			while (rs.next()) {
+				arco.put(idMap.get(rs.getString("teamCode")), rs.getDouble("salario"));
+			}
+			
+			conn.close();
+			return arco;
+		
+		} catch (SQLException e) {
+			System.out.println("Errore connessione al database");
+		throw new RuntimeException("Errore peso arco!", e);
+		
+		}	
+		
+	}
+	
 
 	// =================================================================
 	// ==================== HELPER FUNCTIONS =========================

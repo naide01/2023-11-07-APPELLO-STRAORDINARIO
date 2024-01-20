@@ -55,8 +55,13 @@
 		    <version>2.0.6</version>
 		</dependency>
 
-        
-    </dependencies>
+
+		<dependency>
+			<groupId>it.polito.tdp</groupId>
+			<artifactId>2022-05-24-simulazione</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
     <build>
         <plugins>
             <plugin>
